@@ -2,188 +2,129 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#11100d">
-<title>GoldWindow Victoria v2</title>
+<title>GoldWindow Victoria v2.1</title>
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="data:,">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-:root{--bg:#11100d;--panel:#1b1915;--line:#3a342a;--text:#f3efe6;--muted:#b9b09f;--gold:#d8a83d;--green:#79b86b;--red:#d56b58}
-*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-body{overflow:hidden}.app{height:100%;display:flex;flex-direction:column}
-header{height:58px;background:#15130f;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 12px;gap:10px;z-index:1001}
-.logo{font-weight:800;color:var(--gold);letter-spacing:.3px;font-size:18px}.ver{font-size:11px;color:var(--muted)}
-.topbtn{margin-left:auto;background:#252117;border:1px solid #4a402e;color:var(--text);border-radius:9px;padding:8px 10px}
-main{position:relative;flex:1;min-height:0}.map{position:absolute;inset:0}
-.panel{position:absolute;left:10px;top:10px;width:min(360px,calc(100% - 20px));max-height:calc(100% - 20px);overflow:auto;background:rgba(20,18,14,.94);border:1px solid var(--line);border-radius:12px;padding:12px;z-index:1000;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-h2{font-size:15px;margin:0 0 8px;color:var(--gold)}h3{font-size:13px;margin:14px 0 7px}
-label{font-size:12px;color:var(--muted);display:block;margin:8px 0 4px}
-select,input{width:100%;background:#11100d;border:1px solid #4a4235;color:var(--text);border-radius:8px;padding:9px}
-.row{display:flex;gap:7px}.row>*{flex:1}
-.layer{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px}.layer input{width:auto}
-button{background:#292419;border:1px solid #50452f;color:var(--text);border-radius:8px;padding:8px 10px;font-weight:650}
-button.gold{background:#6d501b;border-color:#a47b2b}
-.small{font-size:11px;color:var(--muted);line-height:1.4}.status{padding:8px;border:1px solid #40382b;border-radius:8px;background:#14120f;margin-top:8px;font-size:11px}
-.target{border:1px solid #51452f;border-radius:9px;padding:8px;margin:7px 0;background:#17140f;cursor:pointer}.target b{color:#e3b449}.score{float:right;color:#e3b449;font-weight:800}.pill{display:inline-block;border:1px solid #55482f;border-radius:999px;padding:2px 6px;margin:2px 3px 0 0;font-size:10px;color:#d8c9a7}
-#details{display:none}.leaflet-control-layers{background:rgba(20,18,14,.94)!important;color:#eee;border:1px solid #51452f!important}.leaflet-control-layers label{color:#eee}.leaflet-control-zoom a{background:#1c1914!important;color:#eee!important}
-.legend{padding:8px;background:rgba(20,18,14,.94);border:1px solid #51452f;border-radius:8px;line-height:16px;color:#eee;font-size:11px}
-.sw{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px;vertical-align:-2px}
-@media(max-width:650px){.panel{width:calc(100% - 20px);max-height:46vh}.leaflet-bottom{bottom:4px}.leaflet-left .leaflet-control{margin-left:8px}}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#11100d;color:#eee;font-family:Arial,sans-serif}
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+header{height:56px;flex:0 0 56px;background:#15130f;border-bottom:1px solid #3b3428;display:flex;align-items:center;padding:0 10px;z-index:2000}
+.logo{font-size:18px;font-weight:800;color:#d9aa3d}.ver{font-size:11px;color:#aaa;margin-left:6px}.gps{margin-left:auto;background:#282218;border:1px solid #55472e;color:#fff;padding:8px 10px;border-radius:8px}
+#map{position:relative;flex:1;min-height:0;width:100%;z-index:1}
+.leaflet-container{height:100%;width:100%;background:#d8d2c4}
+.panel{position:absolute;z-index:1000;left:10px;top:66px;width:min(350px,calc(100% - 20px));max-height:calc(100% - 76px);overflow:auto;background:rgba(22,19,14,.95);border:1px solid #4b402e;border-radius:12px;padding:11px;box-shadow:0 8px 30px #0008}
+h2{font-size:15px;color:#d9aa3d;margin:0 0 5px}.small{font-size:11px;color:#aaa;line-height:1.35}
+h3{font-size:12px;color:#d9aa3d;margin:13px 0 5px}select,button{font:inherit}select{width:100%;padding:8px;border-radius:8px;border:1px solid #51452f;background:#111;color:#eee}
+.row{display:flex;gap:6px;margin-top:6px}.row button{flex:1}
+button{padding:8px;border-radius:8px;border:1px solid #51452f;background:#292319;color:#eee}.gold{background:#6b4e18}
+.layer{display:flex;gap:7px;align-items:center;font-size:11px;padding:5px 0}.layer input{width:16px;height:16px;margin:0}
+.target{margin-top:6px;padding:7px;border:1px solid #4d412c;border-radius:8px;background:#18150f;cursor:pointer}.target b{color:#ddb34c}.score{float:right;color:#ddb34c;font-weight:bold}
+.status{margin-top:7px;padding:7px;border:1px solid #40372a;border-radius:8px;font-size:11px;color:#bbb}
+.leaflet-control-layers{background:#1b1813!important;color:#eee!important;border:1px solid #4d412c!important}
+.leaflet-control-layers label{color:#eee!important}.leaflet-control-zoom a{background:#1b1813!important;color:#eee!important}
+.legend{background:rgba(20,18,14,.93);border:1px solid #51452f;border-radius:7px;padding:6px;font-size:10px;line-height:15px}
+@media(max-width:600px){.panel{max-height:43vh}.leaflet-control-layers{margin-top:60px!important}}
 </style>
 </head>
 <body>
-<div class="app">
-<header><div class="logo">GOLDWINDOW</div><div class="ver">Victoria • v2</div><button class="topbtn" id="locate">◎ GPS</button></header>
-<main>
-<div id="map" class="map"></div>
+<div id="app">
+<header><span class="logo">GOLDWINDOW</span><span class="ver">Victoria v2.1</span><button class="gps" id="gps">◎ GPS</button></header>
+<div id="map">
 <div class="panel">
 <h2>Victoria Prospecting Map</h2>
-<div class="small">Live Victorian spatial layers + terrain visualisation. Use the layer controls to compare LiDAR relief with historical mining evidence.</div>
-
-<label>Jump to goldfield</label>
+<div class="small">The base map loads independently first. Turn Victorian terrain and historical layers on/off as required.</div>
+<h3>Jump to area</h3>
 <select id="area">
-<option value="-37.06,144.22,11">Castlemaine / Chewton</option>
-<option value="-36.76,144.28,11">Bendigo</option>
-<option value="-36.73,143.85,11">Tarnagulla / Dunolly</option>
-<option value="-36.42,143.61,11">Wedderburn</option>
-<option value="-37.05,142.77,11">Stawell / Deep Lead</option>
-<option value="-37.36,144.23,11">Steiglitz</option>
-<option value="-36.75,144.99,11">Rushworth / Whroo</option>
-<option value="-37.87,146.45,11">Walhalla</option>
-<option value="-37.55,145.02,11">Toolangi / Yea</option>
-<option value="-37.28,143.14,11">Ararat / Avoca</option>
+<option value="-37.061,144.214,12">Castlemaine / Chewton</option>
+<option value="-36.765,144.285,12">Bendigo</option>
+<option value="-36.735,143.835,12">Tarnagulla / Dunolly</option>
+<option value="-36.421,143.610,12">Wedderburn</option>
+<option value="-37.055,142.770,12">Stawell / Deep Lead</option>
+<option value="-37.360,144.230,12">Steiglitz</option>
+<option value="-36.750,145.000,12">Rushworth / Whroo</option>
+<option value="-37.870,146.450,12">Walhalla</option>
+<option value="-37.280,143.140,12">Ararat / Avoca</option>
 </select>
-<div class="row" style="margin-top:7px"><button id="jump" class="gold">Go</button><button id="gps">My location</button></div>
-
-<h3>Visual layers</h3>
-<div class="layer"><input type="checkbox" id="relief" checked> <span>1 m LiDAR DEM relief <span class="pill">where covered</span></span></div>
-<div class="layer"><input type="checkbox" id="dem10"> <span>Statewide 10 m DEM</span></div>
-<div class="layer"><input type="checkbox" id="contours"> <span>Vicmap contours</span></div>
-<div class="layer"><input type="checkbox" id="hydro" checked> <span>Watercourses</span></div>
-<div class="layer"><input type="checkbox" id="sat"> <span>Satellite / aerial</span></div>
-
-<h3>Gold evidence</h3>
-<div class="layer"><input type="checkbox" id="minsite" checked> <span>Mines & mineral occurrences</span></div>
-<div class="layer"><input type="checkbox" id="shafts"> <span>Historical mining activity / shafts</span></div>
-<div class="layer"><input type="checkbox" id="deep"> <span>Deep leads</span></div>
-<div class="layer"><input type="checkbox" id="workings"> <span>Shallow workings / leads</span></div>
-<div class="layer"><input type="checkbox" id="geology"> <span>Geology</span></div>
-<div class="layer"><input type="checkbox" id="goldfields"> <span>Goldfields</span></div>
-<div class="layer"><input type="checkbox" id="tenure"> <span>Public-land / tenure context</span></div>
-
-<h3>Target finder</h3>
-<button id="targets" class="gold" style="width:100%">Show target areas</button>
-<div id="targetlist"></div>
-
-<div id="details" class="status"></div>
-<div class="status">
-<b>Important:</b> targets are evidence-based prospectivity areas, not claims that gold is present. Check current land tenure, fossicking/mining rules, closures, cultural heritage constraints and safety before entering or detecting.
-</div>
-<div class="small" style="margin-top:8px">
-Sources: Victorian Government / Vicmap / Resources Victoria / GeoVic spatial services. LiDAR coverage is not statewide at 1 m resolution.
+<div class="row"><button class="gold" id="jump">Go</button><button id="targetBtn">Targets</button></div>
+<h3>Terrain</h3>
+<div class="layer"><input type="checkbox" id="contours">Vicmap contours</div>
+<div class="layer"><input type="checkbox" id="water" checked>Watercourses</div>
+<div class="layer"><input type="checkbox" id="relief">1 m LiDAR/DEM relief*</div>
+<h3>Historical gold evidence</h3>
+<div class="layer"><input type="checkbox" id="mines" checked>Mines / mineral sites</div>
+<div class="layer"><input type="checkbox" id="deep">Deep leads</div>
+<div class="layer"><input type="checkbox" id="goldfields">Goldfields</div>
+<div class="layer"><input type="checkbox" id="geology">Geology</div>
+<div class="layer"><input type="checkbox" id="tenure">Land-tenure context</div>
+<h3>Prospectivity targets</h3>
+<div id="targetList"></div>
+<div class="status"><b>*LiDAR note:</b> 1 m elevation coverage is not statewide. At locations without 1 m coverage, use the statewide DEM/terrain services where available.</div>
+<div class="status">Targets are screening areas based on historical/geospatial evidence, not a guarantee of gold. Always verify current land access, closures, fossicking rules, cultural heritage and safety.</div>
 </div>
 </div>
-</main>
 </div>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/esri-leaflet@3.0.16/dist/esri-leaflet.js"></script>
 <script>
-const map=L.map('map',{zoomControl:false,preferCanvas:true}).setView([-36.85,144.25],7);
-L.control.zoom({position:'bottomright'}).addTo(map);
-
-const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
+(function(){
+'use strict';
+const map=L.map('map',{zoomControl:true,preferCanvas:true}).setView([-36.85,144.25],7);
+const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'});
+osm.addTo(map);
 const topo=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxZoom:17,attribution:'© OpenTopoMap contributors'});
-const satellite=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'});
-const base={OSM:osm,'Topo':topo,'Satellite':satellite};
+const aerial=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Imagery'});
+L.control.layers({'Street':osm,'Topographic':topo,'Satellite':aerial},null,{position:'topright'}).addTo(map);
 
 const WMS='https://opendata.maps.vic.gov.au/geoserver/ows';
-const wmsOpts={service:'WMS',version:'1.3.0',request:'GetMap',format:'image/png',transparent:true,attribution:'Victorian Government open spatial data'};
-function wms(layer,extra={}){return L.tileLayer.wms(WMS,{...wmsOpts,layers:'open-data-platform:'+layer,...extra});}
-
-const relief=L.esri.imageMapLayer({
- url:'https://vicmap.land.vic.gov.au/agsimage/rest/services/elevation/Vicmap_1m_DEM_Relief/ImageServer',
- opacity:.62, attribution:'Vicmap Elevation 1m DEM'
-});
-const dem10=L.esri.imageMapLayer({
- url:'https://tiles-ap1.arcgis.com/P744lA0wf4LlBZ84/arcgis/rest/services/Vicmap_10m_DEM/ImageServer',
- opacity:.45, attribution:'Vicmap Elevation 10m DEM'
-});
-const contours=wms('el_contour',{styles:'open-data-platform:el_contour',opacity:.7});
-const hydro=wms('hy_watercourse',{styles:'line',opacity:.8});
-const minsite=wms('minsite',{opacity:.85});
-const shafts=wms('minhstd',{opacity:.85}); // historical mining activity representation where published
-const deep1=wms('deepld100_polygon',{opacity:.35});
-const deep2=wms('deepld100_arc',{opacity:.85});
-const workings1=wms('minsand1m_polygon',{opacity:.42});
-const workings2=wms('mullock100_polygon',{opacity:.55});
-const geology=wms('geol250_polygon',{opacity:.28});
-const goldfields=wms('goldfld100_polygon',{opacity:.22});
-const tenure=wms('cl_tenure_view',{opacity:.28});
-
-const layers={
-relief,dem10,contours,hydro,minsite,shafts,deep1,deep2,workings1,workings2,geology,goldfields,tenure
+function w(layer,opts){return L.tileLayer.wms(WMS,{layers:'open-data-platform:'+layer,format:'image/png',transparent:true,version:'1.3.0',attribution:'Victorian Government open spatial data',...opts});}
+const LAYERS={
+water:w('hy_watercourse',{opacity:.85}),
+contours:w('el_contour',{opacity:.75}),
+mines:w('minsite',{opacity:.9}),
+deep:w('deepld100_arc',{opacity:.85}),
+goldfields:w('goldfld100_polygon',{opacity:.35}),
+geology:w('geol250_polygon',{opacity:.28}),
+tenure:w('cl_tenure_view',{opacity:.28}),
+relief:w('el_dem_1m',{opacity:.55})
 };
-relief.addTo(map); hydro.addTo(map); minsite.addTo(map);
+LAYERS.water.addTo(map); LAYERS.mines.addTo(map);
 
-L.control.layers(base,{
-'LiDAR 1m relief':relief,'10m DEM':dem10,'Contours':contours,'Watercourses':hydro,
-'Mines / mineral sites':minsite,'Historical mining / shafts':shafts,'Deep lead polygons':deep1,'Deep lead lines':deep2,
-'Shallow workings':workings1,'Mullock / workings':workings2,'Geology':geology,'Goldfields':goldfields,'Tenure context':tenure
-},{collapsed:true,position:'topright'}).addTo(map);
-
-const targetData=[
-{name:'Castlemaine–Chewton terrain/workings zone',lat:-37.061,lon:144.214,score:88,e:['dense historical mining record','shallow workings','deep-lead context','drainage/terrain intersection']},
-{name:'Bendigo historic field margins',lat:-36.765,lon:144.285,score:86,e:['major historic mining field','numerous recorded mineral sites','workings and geology layers','drainage context']},
-{name:'Tarnagulla–Dunolly lead corridor',lat:-36.735,lon:143.835,score:91,e:['deep-lead evidence','historic alluvial mining','drainage alignment','historic workings']},
-{name:'Wedderburn historic field',lat:-36.421,lon:143.61,score:82,e:['historic alluvial activity','goldfield mapping','terrain/drainage context']},
-{name:'Stawell–Deep Lead corridor',lat:-37.055,lon:142.77,score:89,e:['deep-lead association','historic mining activity','alluvial setting','geological context']},
-{name:'Rushworth–Whroo field',lat:-36.75,lon:145.00,score:84,e:['historic reef/alluvial activity','recorded mineral occurrences','workings','terrain context']},
-{name:'Steiglitz–Moorabool field',lat:-37.36,lon:144.23,score:80,e:['historic goldfield','recorded workings','drainage and terrain context']},
-{name:'Walhalla–Stringers Creek field',lat:-37.87,lon:146.45,score:83,e:['historic reef mining','recorded mineral sites','steep terrain/workings']},
-{name:'Ararat–Avoca corridor',lat:-37.28,lon:143.14,score:79,e:['historic goldfield','alluvial potential context','recorded mineral sites']}
+const targets=[
+['Tarnagulla–Dunolly lead corridor',-36.735,143.835,91,'deep-lead;historic alluvial mining;drainage alignment'],
+['Castlemaine–Chewton workings zone',-37.061,144.214,88,'historic workings;goldfield;drainage/terrain'],
+['Stawell–Deep Lead corridor',-37.055,142.770,89,'deep-lead association;historic mining;alluvial setting'],
+['Bendigo historic field',-36.765,144.285,86,'historic mining;mineral sites;workings'],
+['Rushworth–Whroo field',-36.750,145.000,84,'reef/alluvial history;mineral sites;workings'],
+['Walhalla–Stringers Creek',-37.870,146.450,83,'historic reef mining;mineral sites;steep terrain'],
+['Wedderburn field',-36.421,143.610,82,'historic alluvial activity;goldfield;drainage'],
+['Steiglitz–Moorabool field',-37.360,144.230,80,'historic goldfield;workings;drainage'],
+['Ararat–Avoca corridor',-37.280,143.140,79,'historic goldfield;alluvial context;mineral sites']
 ];
-let targetLayer=L.layerGroup().addTo(map);
-
-function popup(t){return `<b>${t.name}</b><br><b>Prospectivity index: ${t.score}/100</b><br><br>${t.e.map(x=>'• '+x).join('<br>')}<br><br><span style="font-size:11px;color:#aaa">Use the live layers to inspect the surrounding terrain and historical evidence. Index is a screening aid only.</span>`}
-function renderTargets(){
+const targetLayer=L.layerGroup().addTo(map);
+function drawTargets(){
  targetLayer.clearLayers();
- targetData.forEach(t=>{
-  const m=L.circleMarker([t.lat,t.lon],{radius:10,weight:2,color:'#d8a83d',fillColor:'#d8a83d',fillOpacity:.78});
-  m.bindPopup(popup(t)); m.addTo(targetLayer);
+ targets.forEach(t=>{
+  L.circleMarker([t[1],t[2]],{radius:10,color:'#d8a83d',fillColor:'#d8a83d',fillOpacity:.82,weight:2})
+  .bindPopup('<b>'+t[0]+'</b><br><b>Screening index: '+t[3]+'/100</b><br><br>• '+t[4].replaceAll(';','<br>• ')+'<br><br><span style="font-size:10px;color:#aaa">Screening aid only.</span>')
+  .addTo(targetLayer);
  });
- const box=document.getElementById('targetlist');
- box.innerHTML=targetData.map((t,i)=>`<div class="target" data-i="${i}"><span class="score">${t.score}</span><b>${t.name}</b><div class="small">${t.e.slice(0,2).join(' • ')}</div></div>`).join('');
- box.querySelectorAll('.target').forEach(el=>el.onclick=()=>{const t=targetData[+el.dataset.i];map.setView([t.lat,t.lon],13);});
+ const box=document.getElementById('targetList');
+ box.innerHTML=targets.map((t,i)=>'<div class="target" data-i="'+i+'"><span class="score">'+t[3]+'</span><b>'+t[0]+'</b><div class="small">'+t[4].split(';').slice(0,2).join(' • ')+'</div></div>').join('');
+ box.querySelectorAll('.target').forEach(x=>x.onclick=()=>{let t=targets[+x.dataset.i];map.setView([t[1],t[2]],13);});
 }
-renderTargets();
+drawTargets();
 
-document.getElementById('targets').onclick=()=>{targetLayer.addTo(map);document.getElementById('targets').textContent='Targets visible ✓'};
-
-function toggle(id,layer){
- document.getElementById(id).addEventListener('change',e=>{
-  if(e.target.checked) layer.addTo(map); else map.removeLayer(layer);
- });
-}
-toggle('relief',relief);toggle('dem10',dem10);toggle('contours',contours);toggle('hydro',hydro);toggle('minsite',minsite);toggle('shafts',shafts);
-toggle('deep',deep1);toggle('workings',workings1);toggle('geology',geology);toggle('goldfields',goldfields);toggle('tenure',tenure);
-
-document.getElementById('sat').addEventListener('change',e=>{
- if(e.target.checked){satellite.addTo(map);satellite.bringToBack();}else map.removeLayer(satellite);
-});
-
-document.getElementById('jump').onclick=()=>{
- const [lat,lon,z]=document.getElementById('area').value.split(',').map(Number);map.setView([lat,lon],z);
-};
+function toggle(id,key){document.getElementById(id).addEventListener('change',function(){if(this.checked)LAYERS[key].addTo(map);else map.removeLayer(LAYERS[key]);});}
+Object.keys({contours:1,water:1,mines:1,deep:1,goldfields:1,geology:1,tenure:1,relief:1}).forEach(k=>toggle(k,k));
+document.getElementById('jump').onclick=()=>{let v=document.getElementById('area').value.split(',').map(Number);map.setView([v[0],v[1]],v[2]);};
+document.getElementById('targetBtn').onclick=()=>{targetLayer.addTo(map);map.setView([-36.85,144.25],7);};
 document.getElementById('gps').onclick=()=>map.locate({setView:true,maxZoom:15,enableHighAccuracy:true});
-document.getElementById('locate').onclick=()=>map.locate({setView:true,maxZoom:15,enableHighAccuracy:true});
-map.on('locationfound',e=>L.marker(e.latlng).addTo(map).bindPopup('Your current position').openPopup());
-map.on('locationerror',e=>alert('Location unavailable. Check browser location permission.'));
-
-const legend=L.control({position:'bottomleft'});
-legend.onAdd=()=>{const d=L.DomUtil.create('div','legend');d.innerHTML='<b>Map guide</b><br><span class="sw" style="background:#d8a83d"></span>GoldWindow target<br><span class="sw" style="background:#4da3ff"></span>Watercourse<br><span class="sw" style="background:#c65a42"></span>Mining evidence';return d};
-legend.addTo(map);
+map.on('locationfound',e=>L.marker(e.latlng).addTo(map).bindPopup('Current position').openPopup());
+map.on('locationerror',()=>alert('Location unavailable. Check browser location permission.'));
+setTimeout(()=>map.invalidateSize(true),300);
+window.addEventListener('resize',()=>map.invalidateSize(true));
+})();
 </script>
 </body>
 </html>

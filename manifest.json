@@ -1,0 +1,8 @@
+{
+  "name": "GoldWindow Victoria",
+  "short_name": "GoldWindow",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#17130d",
+  "theme_color": "#1b160d"
+}

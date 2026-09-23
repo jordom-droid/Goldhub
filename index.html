@@ -1,28 +1,189 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1b160d"><link rel="manifest" href="manifest.json"><title>GoldWindow Victoria</title><style>
-:root{--bg:#17130d;--card:#282016;--gold:#d6a53a;--text:#f5efe3;--muted:#b9ad99}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui}header{padding:15px;background:#211a11;position:sticky;top:0;z-index:3;border-bottom:1px solid #493a24}h1{margin:0;font-size:22px;color:var(--gold)}main{padding:12px;max-width:850px;margin:auto}.card{background:var(--card);border:1px solid #4a3a22;border-radius:12px;padding:12px;margin-bottom:12px}h2{font-size:17px;margin:0 0 10px}select,button{width:100%;padding:11px;border-radius:8px;border:1px solid #66502c;background:#17130d;color:var(--text);font-size:15px}button{background:#6d501e;font-weight:700}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}#map{height:430px;border-radius:10px;overflow:hidden;background:#293a29;border:1px solid #5b4829}svg{width:100%;height:100%}.score{text-align:center;font-size:54px;font-weight:800;color:var(--gold)}.scorelabel{text-align:center;color:var(--muted);margin-bottom:12px}.target{padding:10px;border-radius:9px;background:#19140d;border:1px solid #4a3a22;margin:7px 0}.target b{color:var(--gold)}.pill{display:inline-block;padding:4px 7px;border-radius:99px;background:#3b2d18;color:#e6c56e;font-size:12px;margin:2px}.notice{padding:9px;background:#352917;border-left:4px solid var(--gold);border-radius:5px}.small{color:var(--muted)}a{color:#e0bb5d}</style></head><body>
-<header><h1>⛏ GoldWindow Victoria</h1><div class="small">Historical gold prospecting • terrain • workings • target mapping</div></header><main>
-<section class="card"><h2>Search area</h2><div class="row"><select id="area"></select><button id="gps">📍 Use my location</button></div></section>
-<section class="card"><div id="map"><svg viewBox="0 0 800 430" preserveAspectRatio="none"><defs><pattern id="g" width="35" height="35" patternUnits="userSpaceOnUse"><path d="M35 0H0V35" fill="none" stroke="#35432c"/></pattern></defs><rect width="800" height="430" fill="#293a29"/><rect width="800" height="430" fill="url(#g)"/><path d="M0 315C130 270 190 340 300 275S500 250 800 315" fill="none" stroke="#58704b" stroke-width="14"/><path d="M0 350C140 300 260 380 390 320S650 300 800 345" fill="none" stroke="#9a895c" stroke-width="3"/><g id="markers"></g></svg></div></section>
-<section class="card"><h2>Area prospectivity</h2><div class="score" id="score">—</div><div class="scorelabel" id="scoreText">Select an area</div><div id="indicators"></div></section>
-<section class="card"><h2>Key target areas</h2><div id="targets"></div></section>
-<section class="card"><h2>Selected target</h2><div id="selected" class="notice">Tap a target below.</div><button id="save" style="margin-top:8px">★ Save target</button></section>
-<section class="card"><h2>Saved targets</h2><div id="saved"></div></section>
-<section class="card"><h2>Evidence & data</h2><p class="small">v1 combines historical goldfield indicators into a target model. Authoritative spatial layers can be added in later releases.</p><p><a href="https://geology.data.vic.gov.au/" target="_blank">GSV Discovery Portal</a></p><p><a href="https://resources.vic.gov.au/geology-and-data/maps-reports-data/geovic" target="_blank">GeoVic</a></p><p><a href="https://discover.data.vic.gov.au/" target="_blank">DataVic</a></p><p><a href="https://www.land.vic.gov.au/maps-and-spatial/imagery/elevation-data" target="_blank">Victorian elevation / LiDAR</a></p><p><a href="https://trove.nla.gov.au/" target="_blank">Trove historical newspapers</a></p><div class="notice">Check current land access, tenure, fossicking/mining rules and site safety before detecting.</div></section>
-</main><script>
-const A={
-"Castlemaine / Chewton":[-37.06,144.22,91,["Historic workings","Alluvial gold history","Quartz reef country"],[["Forest Creek diggings",-37.065,144.222,94,"Historic alluvial workings + drainage + dense diggings"],["Chewton reef country",-37.077,144.265,89,"Quartz reef/mining history + historic workings"],["Campbells Creek",-37.09,144.215,86,"Historic alluvial corridor + old workings"]]],
-"Bendigo":[-36.758,144.28,94,["Major historic goldfield","Deep-lead mining","Quartz reef systems"],[["Bendigo Creek / Golden Square",-36.77,144.27,95,"Major historic workings + alluvial/deep-lead evidence"],["Long Gully",-36.73,144.255,92,"Historic reef and alluvial mining"],["Eaglehawk",-36.72,144.25,90,"Extensive historic mine footprint"]]],
-"Tarnagulla / Dunolly":[-36.75,143.83,93,["Historic alluvial goldfield","Deep leads","Old diggings"],[["Tarnagulla diggings",-36.75,143.83,94,"Historic alluvial workings + reef country"],["Dunolly outskirts",-36.85,143.73,91,"Major historic alluvial goldfield"],["Bet Bet Creek",-36.78,143.72,88,"Historic alluvial drainage"]]],
-"Wedderburn":[-36.42,143.62,89,["Alluvial gold history","Old workings","Quartz reef indicators"],[["Wedderburn diggings",-36.42,143.62,91,"Historic workings + alluvial indicators"],["Korong Vale",-36.38,143.77,86,"Historic reef/alluvial country"]]],
-"Stawell / Deep Lead":[-37.06,142.77,88,["Historic quartz reef mining","Alluvial workings","Deep Lead goldfield"],[["Deep Lead",-37.12,142.92,91,"Historic deep-lead/alluvial evidence"],["Stawell outskirts",-37.06,142.77,88,"Major reef mining history"],["Fiery Creek",-37.04,142.69,84,"Historic alluvial country"]]],
-"Steiglitz":[-37.91,144.18,87,["Historic goldfield","Alluvial workings","Quartz reef history"],[["Steiglitz township diggings",-37.902,144.184,91,"Historic workings + reef/alluvial indicators"],["Moorabool valley",-37.94,144.15,84,"Historic alluvial drainage"],["Spargo Creek",-37.91,144.10,82,"Historic goldfield evidence"]]],
-"Rushworth / Whroo":[-36.59,145.02,90,["Historic reef mining","Alluvial workings","Old shafts"],[["Whroo diggings",-36.66,145.01,93,"Historic workings + reef country"],["Rushworth forest edge",-36.59,145.02,89,"Dense historic mining footprint"]]],
-"Walhalla":[-37.94,146.45,86,["Historic reef mining","Quartz veins","Deep gullies"],[["Walhalla valley",-37.94,146.45,90,"Historic reef mining + steep drainage"],["Stringers Creek",-37.95,146.46,87,"Historic workings + drainage"]]]
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#11100d">
+<title>GoldWindow Victoria v2</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#11100d;--panel:#1b1915;--line:#3a342a;--text:#f3efe6;--muted:#b9b09f;--gold:#d8a83d;--green:#79b86b;--red:#d56b58}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+body{overflow:hidden}.app{height:100%;display:flex;flex-direction:column}
+header{height:58px;background:#15130f;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 12px;gap:10px;z-index:1001}
+.logo{font-weight:800;color:var(--gold);letter-spacing:.3px;font-size:18px}.ver{font-size:11px;color:var(--muted)}
+.topbtn{margin-left:auto;background:#252117;border:1px solid #4a402e;color:var(--text);border-radius:9px;padding:8px 10px}
+main{position:relative;flex:1;min-height:0}.map{position:absolute;inset:0}
+.panel{position:absolute;left:10px;top:10px;width:min(360px,calc(100% - 20px));max-height:calc(100% - 20px);overflow:auto;background:rgba(20,18,14,.94);border:1px solid var(--line);border-radius:12px;padding:12px;z-index:1000;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+h2{font-size:15px;margin:0 0 8px;color:var(--gold)}h3{font-size:13px;margin:14px 0 7px}
+label{font-size:12px;color:var(--muted);display:block;margin:8px 0 4px}
+select,input{width:100%;background:#11100d;border:1px solid #4a4235;color:var(--text);border-radius:8px;padding:9px}
+.row{display:flex;gap:7px}.row>*{flex:1}
+.layer{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px}.layer input{width:auto}
+button{background:#292419;border:1px solid #50452f;color:var(--text);border-radius:8px;padding:8px 10px;font-weight:650}
+button.gold{background:#6d501b;border-color:#a47b2b}
+.small{font-size:11px;color:var(--muted);line-height:1.4}.status{padding:8px;border:1px solid #40382b;border-radius:8px;background:#14120f;margin-top:8px;font-size:11px}
+.target{border:1px solid #51452f;border-radius:9px;padding:8px;margin:7px 0;background:#17140f;cursor:pointer}.target b{color:#e3b449}.score{float:right;color:#e3b449;font-weight:800}.pill{display:inline-block;border:1px solid #55482f;border-radius:999px;padding:2px 6px;margin:2px 3px 0 0;font-size:10px;color:#d8c9a7}
+#details{display:none}.leaflet-control-layers{background:rgba(20,18,14,.94)!important;color:#eee;border:1px solid #51452f!important}.leaflet-control-layers label{color:#eee}.leaflet-control-zoom a{background:#1c1914!important;color:#eee!important}
+.legend{padding:8px;background:rgba(20,18,14,.94);border:1px solid #51452f;border-radius:8px;line-height:16px;color:#eee;font-size:11px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px;vertical-align:-2px}
+@media(max-width:650px){.panel{width:calc(100% - 20px);max-height:46vh}.leaflet-bottom{bottom:4px}.leaflet-left .leaflet-control{margin-left:8px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="logo">GOLDWINDOW</div><div class="ver">Victoria • v2</div><button class="topbtn" id="locate">◎ GPS</button></header>
+<main>
+<div id="map" class="map"></div>
+<div class="panel">
+<h2>Victoria Prospecting Map</h2>
+<div class="small">Live Victorian spatial layers + terrain visualisation. Use the layer controls to compare LiDAR relief with historical mining evidence.</div>
+
+<label>Jump to goldfield</label>
+<select id="area">
+<option value="-37.06,144.22,11">Castlemaine / Chewton</option>
+<option value="-36.76,144.28,11">Bendigo</option>
+<option value="-36.73,143.85,11">Tarnagulla / Dunolly</option>
+<option value="-36.42,143.61,11">Wedderburn</option>
+<option value="-37.05,142.77,11">Stawell / Deep Lead</option>
+<option value="-37.36,144.23,11">Steiglitz</option>
+<option value="-36.75,144.99,11">Rushworth / Whroo</option>
+<option value="-37.87,146.45,11">Walhalla</option>
+<option value="-37.55,145.02,11">Toolangi / Yea</option>
+<option value="-37.28,143.14,11">Ararat / Avoca</option>
+</select>
+<div class="row" style="margin-top:7px"><button id="jump" class="gold">Go</button><button id="gps">My location</button></div>
+
+<h3>Visual layers</h3>
+<div class="layer"><input type="checkbox" id="relief" checked> <span>1 m LiDAR DEM relief <span class="pill">where covered</span></span></div>
+<div class="layer"><input type="checkbox" id="dem10"> <span>Statewide 10 m DEM</span></div>
+<div class="layer"><input type="checkbox" id="contours"> <span>Vicmap contours</span></div>
+<div class="layer"><input type="checkbox" id="hydro" checked> <span>Watercourses</span></div>
+<div class="layer"><input type="checkbox" id="sat"> <span>Satellite / aerial</span></div>
+
+<h3>Gold evidence</h3>
+<div class="layer"><input type="checkbox" id="minsite" checked> <span>Mines & mineral occurrences</span></div>
+<div class="layer"><input type="checkbox" id="shafts"> <span>Historical mining activity / shafts</span></div>
+<div class="layer"><input type="checkbox" id="deep"> <span>Deep leads</span></div>
+<div class="layer"><input type="checkbox" id="workings"> <span>Shallow workings / leads</span></div>
+<div class="layer"><input type="checkbox" id="geology"> <span>Geology</span></div>
+<div class="layer"><input type="checkbox" id="goldfields"> <span>Goldfields</span></div>
+<div class="layer"><input type="checkbox" id="tenure"> <span>Public-land / tenure context</span></div>
+
+<h3>Target finder</h3>
+<button id="targets" class="gold" style="width:100%">Show target areas</button>
+<div id="targetlist"></div>
+
+<div id="details" class="status"></div>
+<div class="status">
+<b>Important:</b> targets are evidence-based prospectivity areas, not claims that gold is present. Check current land tenure, fossicking/mining rules, closures, cultural heritage constraints and safety before entering or detecting.
+</div>
+<div class="small" style="margin-top:8px">
+Sources: Victorian Government / Vicmap / Resources Victoria / GeoVic spatial services. LiDAR coverage is not statewide at 1 m resolution.
+</div>
+</div>
+</main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/esri-leaflet@3.0.16/dist/esri-leaflet.js"></script>
+<script>
+const map=L.map('map',{zoomControl:false,preferCanvas:true}).setView([-36.85,144.25],7);
+L.control.zoom({position:'bottomright'}).addTo(map);
+
+const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
+const topo=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxZoom:17,attribution:'© OpenTopoMap contributors'});
+const satellite=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'});
+const base={OSM:osm,'Topo':topo,'Satellite':satellite};
+
+const WMS='https://opendata.maps.vic.gov.au/geoserver/ows';
+const wmsOpts={service:'WMS',version:'1.3.0',request:'GetMap',format:'image/png',transparent:true,attribution:'Victorian Government open spatial data'};
+function wms(layer,extra={}){return L.tileLayer.wms(WMS,{...wmsOpts,layers:'open-data-platform:'+layer,...extra});}
+
+const relief=L.esri.imageMapLayer({
+ url:'https://vicmap.land.vic.gov.au/agsimage/rest/services/elevation/Vicmap_1m_DEM_Relief/ImageServer',
+ opacity:.62, attribution:'Vicmap Elevation 1m DEM'
+});
+const dem10=L.esri.imageMapLayer({
+ url:'https://tiles-ap1.arcgis.com/P744lA0wf4LlBZ84/arcgis/rest/services/Vicmap_10m_DEM/ImageServer',
+ opacity:.45, attribution:'Vicmap Elevation 10m DEM'
+});
+const contours=wms('el_contour',{styles:'open-data-platform:el_contour',opacity:.7});
+const hydro=wms('hy_watercourse',{styles:'line',opacity:.8});
+const minsite=wms('minsite',{opacity:.85});
+const shafts=wms('minhstd',{opacity:.85}); // historical mining activity representation where published
+const deep1=wms('deepld100_polygon',{opacity:.35});
+const deep2=wms('deepld100_arc',{opacity:.85});
+const workings1=wms('minsand1m_polygon',{opacity:.42});
+const workings2=wms('mullock100_polygon',{opacity:.55});
+const geology=wms('geol250_polygon',{opacity:.28});
+const goldfields=wms('goldfld100_polygon',{opacity:.22});
+const tenure=wms('cl_tenure_view',{opacity:.28});
+
+const layers={
+relief,dem10,contours,hydro,minsite,shafts,deep1,deep2,workings1,workings2,geology,goldfields,tenure
 };
-let cur=Object.keys(A)[0],sel=null;const area=document.getElementById("area");Object.keys(A).forEach(k=>area.add(new Option(k,k)));area.onchange=()=>{cur=area.value;draw()};
-function draw(){let a=A[cur],t=a[4];score.textContent=a[2];scoreText.textContent=a[2]>=90?"Very high historical prospectivity":a[2]>=80?"High historical prospectivity":"Moderate historical prospectivity";indicators.innerHTML=a[3].map(x=>`<span class="pill">✓ ${x}</span>`).join("");targets.innerHTML=t.map((p,i)=>`<div class="target" onclick="choose(${i})"><b>${p[0]}</b><br>Score ${p[3]}/100 • ${p[1].toFixed(5)}, ${p[2].toFixed(5)}<br><span class="small">${p[4]}</span></div>`).join("");markers.innerHTML=t.map((p,i)=>{let x=120+(p[2]-a[1])*9000,y=215-(p[1]-a[0])*9000;return `<circle cx="${x}" cy="${y}" r="${p[3]>90?9:7}" fill="#e2b640" stroke="#17130d" stroke-width="3" onclick="choose(${i})"/><text x="${x+10}" y="${y+4}" fill="#fff" font-size="12">${i+1}</text>`}).join("")}
-function choose(i){sel=A[cur][4][i];selected.innerHTML=`<b>${sel[0]}</b><br><br>Coordinates: <b>${sel[1].toFixed(6)}, ${sel[2].toFixed(6)}</b><br>Target score: <b>${sel[3]}/100</b><br>${sel[4]}<br><br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=${sel[1]},${sel[2]}">Open in Google Maps</a>`}
-save.onclick=()=>{if(!sel)return;let s=JSON.parse(localStorage.getItem("goldSaved")||"[]");if(!s.some(x=>x[1]===sel[1]&&x[2]===sel[2]))s.push(sel);localStorage.setItem("goldSaved",JSON.stringify(s));saved.innerHTML=s.map(x=>`<div class="target"><b>${x[0]}</b><br>${x[1].toFixed(6)}, ${x[2].toFixed(6)} • ${x[3]}/100<br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=${x[1]},${x[2]}">Open map</a></div>`).join("")};
-gps.onclick=()=>navigator.geolocation?.getCurrentPosition(p=>selected.innerHTML=`<b>Your current position</b><br>${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}<br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=${p.coords.latitude},${p.coords.longitude}">Open in Google Maps</a>`);
-draw();saved.innerHTML="<span class='small'>No saved targets yet.</span>";
-</script></body></html>
+relief.addTo(map); hydro.addTo(map); minsite.addTo(map);
+
+L.control.layers(base,{
+'LiDAR 1m relief':relief,'10m DEM':dem10,'Contours':contours,'Watercourses':hydro,
+'Mines / mineral sites':minsite,'Historical mining / shafts':shafts,'Deep lead polygons':deep1,'Deep lead lines':deep2,
+'Shallow workings':workings1,'Mullock / workings':workings2,'Geology':geology,'Goldfields':goldfields,'Tenure context':tenure
+},{collapsed:true,position:'topright'}).addTo(map);
+
+const targetData=[
+{name:'Castlemaine–Chewton terrain/workings zone',lat:-37.061,lon:144.214,score:88,e:['dense historical mining record','shallow workings','deep-lead context','drainage/terrain intersection']},
+{name:'Bendigo historic field margins',lat:-36.765,lon:144.285,score:86,e:['major historic mining field','numerous recorded mineral sites','workings and geology layers','drainage context']},
+{name:'Tarnagulla–Dunolly lead corridor',lat:-36.735,lon:143.835,score:91,e:['deep-lead evidence','historic alluvial mining','drainage alignment','historic workings']},
+{name:'Wedderburn historic field',lat:-36.421,lon:143.61,score:82,e:['historic alluvial activity','goldfield mapping','terrain/drainage context']},
+{name:'Stawell–Deep Lead corridor',lat:-37.055,lon:142.77,score:89,e:['deep-lead association','historic mining activity','alluvial setting','geological context']},
+{name:'Rushworth–Whroo field',lat:-36.75,lon:145.00,score:84,e:['historic reef/alluvial activity','recorded mineral occurrences','workings','terrain context']},
+{name:'Steiglitz–Moorabool field',lat:-37.36,lon:144.23,score:80,e:['historic goldfield','recorded workings','drainage and terrain context']},
+{name:'Walhalla–Stringers Creek field',lat:-37.87,lon:146.45,score:83,e:['historic reef mining','recorded mineral sites','steep terrain/workings']},
+{name:'Ararat–Avoca corridor',lat:-37.28,lon:143.14,score:79,e:['historic goldfield','alluvial potential context','recorded mineral sites']}
+];
+let targetLayer=L.layerGroup().addTo(map);
+
+function popup(t){return `<b>${t.name}</b><br><b>Prospectivity index: ${t.score}/100</b><br><br>${t.e.map(x=>'• '+x).join('<br>')}<br><br><span style="font-size:11px;color:#aaa">Use the live layers to inspect the surrounding terrain and historical evidence. Index is a screening aid only.</span>`}
+function renderTargets(){
+ targetLayer.clearLayers();
+ targetData.forEach(t=>{
+  const m=L.circleMarker([t.lat,t.lon],{radius:10,weight:2,color:'#d8a83d',fillColor:'#d8a83d',fillOpacity:.78});
+  m.bindPopup(popup(t)); m.addTo(targetLayer);
+ });
+ const box=document.getElementById('targetlist');
+ box.innerHTML=targetData.map((t,i)=>`<div class="target" data-i="${i}"><span class="score">${t.score}</span><b>${t.name}</b><div class="small">${t.e.slice(0,2).join(' • ')}</div></div>`).join('');
+ box.querySelectorAll('.target').forEach(el=>el.onclick=()=>{const t=targetData[+el.dataset.i];map.setView([t.lat,t.lon],13);});
+}
+renderTargets();
+
+document.getElementById('targets').onclick=()=>{targetLayer.addTo(map);document.getElementById('targets').textContent='Targets visible ✓'};
+
+function toggle(id,layer){
+ document.getElementById(id).addEventListener('change',e=>{
+  if(e.target.checked) layer.addTo(map); else map.removeLayer(layer);
+ });
+}
+toggle('relief',relief);toggle('dem10',dem10);toggle('contours',contours);toggle('hydro',hydro);toggle('minsite',minsite);toggle('shafts',shafts);
+toggle('deep',deep1);toggle('workings',workings1);toggle('geology',geology);toggle('goldfields',goldfields);toggle('tenure',tenure);
+
+document.getElementById('sat').addEventListener('change',e=>{
+ if(e.target.checked){satellite.addTo(map);satellite.bringToBack();}else map.removeLayer(satellite);
+});
+
+document.getElementById('jump').onclick=()=>{
+ const [lat,lon,z]=document.getElementById('area').value.split(',').map(Number);map.setView([lat,lon],z);
+};
+document.getElementById('gps').onclick=()=>map.locate({setView:true,maxZoom:15,enableHighAccuracy:true});
+document.getElementById('locate').onclick=()=>map.locate({setView:true,maxZoom:15,enableHighAccuracy:true});
+map.on('locationfound',e=>L.marker(e.latlng).addTo(map).bindPopup('Your current position').openPopup());
+map.on('locationerror',e=>alert('Location unavailable. Check browser location permission.'));
+
+const legend=L.control({position:'bottomleft'});
+legend.onAdd=()=>{const d=L.DomUtil.create('div','legend');d.innerHTML='<b>Map guide</b><br><span class="sw" style="background:#d8a83d"></span>GoldWindow target<br><span class="sw" style="background:#4da3ff"></span>Watercourse<br><span class="sw" style="background:#c65a42"></span>Mining evidence';return d};
+legend.addTo(map);
+</script>
+</body>
+</html>

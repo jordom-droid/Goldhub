@@ -1,8 +1,10 @@
 {
   "name": "GoldWindow Victoria",
   "short_name": "GoldWindow",
-  "start_url": "./",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#17130d",
-  "theme_color": "#1b160d"
+  "background_color": "#11100d",
+  "theme_color": "#11100d",
+  "description": "Victoria gold prospecting map with terrain, LiDAR relief and historical mining layers.",
+  "icons": []
 }

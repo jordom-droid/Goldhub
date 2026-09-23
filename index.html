@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#11100d">
-<title>GoldWindow Victoria v2.1</title>
+<title>GoldWindow Victoria v2.2</title>
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -12,29 +12,39 @@
 #app{position:fixed;inset:0;display:flex;flex-direction:column}
 header{height:56px;flex:0 0 56px;background:#15130f;border-bottom:1px solid #3b3428;display:flex;align-items:center;padding:0 10px;z-index:2000}
 .logo{font-size:18px;font-weight:800;color:#d9aa3d}.ver{font-size:11px;color:#aaa;margin-left:6px}.gps{margin-left:auto;background:#282218;border:1px solid #55472e;color:#fff;padding:8px 10px;border-radius:8px}
-#map{position:relative;flex:1;min-height:0;width:100%;z-index:1}
-.leaflet-container{height:100%;width:100%;background:#d8d2c4}
-.panel{position:absolute;z-index:1000;left:10px;top:66px;width:min(350px,calc(100% - 20px));max-height:calc(100% - 76px);overflow:auto;background:rgba(22,19,14,.95);border:1px solid #4b402e;border-radius:12px;padding:11px;box-shadow:0 8px 30px #0008}
-h2{font-size:15px;color:#d9aa3d;margin:0 0 5px}.small{font-size:11px;color:#aaa;line-height:1.35}
-h3{font-size:12px;color:#d9aa3d;margin:13px 0 5px}select,button{font:inherit}select{width:100%;padding:8px;border-radius:8px;border:1px solid #51452f;background:#111;color:#eee}
-.row{display:flex;gap:6px;margin-top:6px}.row button{flex:1}
+#map{position:relative;flex:1;min-height:0;width:100%;z-index:1}.leaflet-container{height:100%;width:100%;background:#d8d2c4}
+.panel{position:absolute;z-index:1000;left:10px;top:66px;width:min(365px,calc(100% - 20px));max-height:calc(100% - 76px);overflow:auto;background:rgba(22,19,14,.96);border:1px solid #4b402e;border-radius:12px;padding:11px;box-shadow:0 8px 30px #0008}
+h2{font-size:15px;color:#d9aa3d;margin:0 0 4px}.small{font-size:11px;color:#aaa;line-height:1.35}h3{font-size:12px;color:#d9aa3d;margin:13px 0 5px}
+select,button{font:inherit}select{width:100%;padding:8px;border-radius:8px;border:1px solid #51452f;background:#111;color:#eee}.row{display:flex;gap:6px;margin-top:6px}.row button{flex:1}
 button{padding:8px;border-radius:8px;border:1px solid #51452f;background:#292319;color:#eee}.gold{background:#6b4e18}
-.layer{display:flex;gap:7px;align-items:center;font-size:11px;padding:5px 0}.layer input{width:16px;height:16px;margin:0}
+.preset{display:grid;grid-template-columns:1fr 1fr;gap:6px}.preset button{font-size:11px;text-align:left}
+.layer{display:flex;gap:8px;align-items:flex-start;font-size:11px;padding:7px 0;border-top:1px solid #2f291f}.layer:first-child{border-top:0}.layer input{width:16px;height:16px;margin:1px 0 0;flex:0 0 16px}
+.layer b{display:block;color:#eee;font-size:11px}.layer span{display:block;color:#999;font-size:10px;line-height:1.25;margin-top:2px}
+.info{display:inline-flex;width:17px;height:17px;border:1px solid #75603a;border-radius:50%;align-items:center;justify-content:center;color:#d9aa3d;font-size:10px;margin-left:4px;cursor:pointer}
 .target{margin-top:6px;padding:7px;border:1px solid #4d412c;border-radius:8px;background:#18150f;cursor:pointer}.target b{color:#ddb34c}.score{float:right;color:#ddb34c;font-weight:bold}
-.status{margin-top:7px;padding:7px;border:1px solid #40372a;border-radius:8px;font-size:11px;color:#bbb}
-.leaflet-control-layers{background:#1b1813!important;color:#eee!important;border:1px solid #4d412c!important}
-.leaflet-control-layers label{color:#eee!important}.leaflet-control-zoom a{background:#1b1813!important;color:#eee!important}
+.status{margin-top:7px;padding:7px;border:1px solid #40372a;border-radius:8px;font-size:11px;color:#bbb;line-height:1.35}
+.key{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.key span{padding:4px 6px;border-radius:5px;font-size:10px;border:1px solid #493d2b}
+.leaflet-control-layers{background:#1b1813!important;color:#eee!important;border:1px solid #4d412c!important}.leaflet-control-layers label{color:#eee!important}.leaflet-control-zoom a{background:#1b1813!important;color:#eee!important}
 .legend{background:rgba(20,18,14,.93);border:1px solid #51452f;border-radius:7px;padding:6px;font-size:10px;line-height:15px}
-@media(max-width:600px){.panel{max-height:43vh}.leaflet-control-layers{margin-top:60px!important}}
+@media(max-width:600px){.panel{max-height:49vh}.leaflet-control-layers{margin-top:60px!important}}
 </style>
 </head>
 <body>
 <div id="app">
-<header><span class="logo">GOLDWINDOW</span><span class="ver">Victoria v2.1</span><button class="gps" id="gps">◎ GPS</button></header>
+<header><span class="logo">GOLDWINDOW</span><span class="ver">Victoria v2.2</span><button class="gps" id="gps">◎ GPS</button></header>
 <div id="map">
 <div class="panel">
-<h2>Victoria Prospecting Map</h2>
-<div class="small">The base map loads independently first. Turn Victorian terrain and historical layers on/off as required.</div>
+<h2>Victoria Gold Prospecting Map</h2>
+<div class="small">Turn layers on one at a time first. Each description explains what the layer shows and why you might use it.</div>
+
+<h3>Quick views</h3>
+<div class="preset">
+<button data-preset="terrain">⛰ Terrain<br><span class="small">shape + drainage</span></button>
+<button data-preset="history">⛏ Gold history<br><span class="small">mines + workings</span></button>
+<button data-preset="geology">🪨 Ground setting<br><span class="small">geology + goldfields</span></button>
+<button data-preset="all">🔎 Evidence stack<br><span class="small">key layers together</span></button>
+</div>
+
 <h3>Jump to area</h3>
 <select id="area">
 <option value="-37.061,144.214,12">Castlemaine / Chewton</option>
@@ -47,47 +57,81 @@ button{padding:8px;border-radius:8px;border:1px solid #51452f;background:#292319
 <option value="-37.870,146.450,12">Walhalla</option>
 <option value="-37.280,143.140,12">Ararat / Avoca</option>
 </select>
-<div class="row"><button class="gold" id="jump">Go</button><button id="targetBtn">Targets</button></div>
-<h3>Terrain</h3>
-<div class="layer"><input type="checkbox" id="contours">Vicmap contours</div>
-<div class="layer"><input type="checkbox" id="water" checked>Watercourses</div>
-<div class="layer"><input type="checkbox" id="relief">1 m LiDAR/DEM relief*</div>
-<h3>Historical gold evidence</h3>
-<div class="layer"><input type="checkbox" id="mines" checked>Mines / mineral sites</div>
-<div class="layer"><input type="checkbox" id="deep">Deep leads</div>
-<div class="layer"><input type="checkbox" id="goldfields">Goldfields</div>
-<div class="layer"><input type="checkbox" id="geology">Geology</div>
-<div class="layer"><input type="checkbox" id="tenure">Land-tenure context</div>
+<div class="row"><button class="gold" id="jump">Go</button><button id="targetBtn">Show targets</button></div>
+
+<h3>1. Read the ground</h3>
+<div class="layer"><input type="checkbox" id="contours">
+<div><b>Contours — ground shape</b><span>Lines showing elevation. Tight lines = steeper ground; broad spacing = flatter ground. Useful for tracing gullies, ridges and benches.</span></div></div>
+<div class="layer"><input type="checkbox" id="relief">
+<div><b>10 m terrain relief — broad landform</b><span>Statewide elevation terrain from the public Vicmap 10 m DEM. Use this for regional landform; it is not 1 m LiDAR.</span></div></div>
+<div class="layer"><input type="checkbox" id="water" checked>
+<div><b>Water & drainage — where water moves</b><span>Mapped watercourses. Useful alongside terrain for following drainage and alluvial settings.</span></div></div>
+<div class="layer"><input type="checkbox" id="lidar">
+<div><b>1 m LiDAR availability — high-resolution coverage</b><span>Shows where Victorian 1 m DEM/LiDAR products exist or are referenced. It is a coverage indicator, not the 1 m surface itself.</span></div></div>
+
+<h3>2. Find the old gold evidence</h3>
+<div class="layer"><input type="checkbox" id="mines" checked>
+<div><b>Historic mines & mineral sites — old workings</b><span>Mapped mineral sites and mine locations. Useful for finding previously worked ground and historical mining districts.</span></div></div>
+<div class="layer"><input type="checkbox" id="deep">
+<div><b>Deep leads — buried ancient channels</b><span>Mapped deep-lead features. These are geological/historical clues, not a claim that gold is present at every point.</span></div></div>
+<div class="layer"><input type="checkbox" id="goldfields">
+<div><b>Goldfields — historic district extent</b><span>Broad goldfield polygons. Good for regional context; much less precise than individual workings or geology.</span></div></div>
+
+<h3>3. Understand the ground</h3>
+<div class="layer"><input type="checkbox" id="geology">
+<div><b>Geology — rock and geological setting</b><span>Broad geological units. Use it to compare the type of ground around historic workings and goldfields.</span></div></div>
+<div class="layer"><input type="checkbox" id="tenure">
+<div><b>Land tenure — access context</b><span>Land-tenure context only. Always verify current rules, permissions, closures and fossicking/mining restrictions before entering land.</span></div></div>
+
+<div class="status"><b>How the layers differ:</b><br>
+<strong>Contours / relief</strong> = what the land looks like.<br>
+<strong>Water</strong> = where drainage runs.<br>
+<strong>LiDAR coverage</strong> = where higher-resolution elevation data may be available.<br>
+<strong>Mines / deep leads</strong> = where historical mining evidence is recorded.<br>
+<strong>Goldfields</strong> = broad historic district context.<br>
+<strong>Geology</strong> = what the ground is made of.<br>
+<strong>Tenure</strong> = who/what controls the land.
+</div>
+<div class="status"><b>Important LiDAR note:</b> Victoria's 1 m DEM is LiDAR-derived but statewide public 1 m web access is restricted. This app therefore does not pretend a statewide 1 m LiDAR surface is available. The public statewide 10 m DEM is used for broad terrain, with 1 m coverage treated separately.</div>
+<div class="status">Targets are screening areas based on historical/geospatial evidence, not a guarantee of gold. Verify current access, closures, fossicking rules, cultural heritage requirements and safety.</div>
+
 <h3>Prospectivity targets</h3>
 <div id="targetList"></div>
-<div class="status"><b>*LiDAR note:</b> 1 m elevation coverage is not statewide. At locations without 1 m coverage, use the statewide DEM/terrain services where available.</div>
-<div class="status">Targets are screening areas based on historical/geospatial evidence, not a guarantee of gold. Always verify current land access, closures, fossicking rules, cultural heritage and safety.</div>
-</div>
-</div>
-</div>
+</div></div></div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
 'use strict';
 const map=L.map('map',{zoomControl:true,preferCanvas:true}).setView([-36.85,144.25],7);
-const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'});
-osm.addTo(map);
+const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
 const topo=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxZoom:17,attribution:'© OpenTopoMap contributors'});
 const aerial=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Imagery'});
 L.control.layers({'Street':osm,'Topographic':topo,'Satellite':aerial},null,{position:'topright'}).addTo(map);
 
 const WMS='https://opendata.maps.vic.gov.au/geoserver/ows';
-function w(layer,opts){return L.tileLayer.wms(WMS,{layers:'open-data-platform:'+layer,format:'image/png',transparent:true,version:'1.3.0',attribution:'Victorian Government open spatial data',...opts});}
+function w(layer,opts={}){return L.tileLayer.wms(WMS,{layers:'open-data-platform:'+layer,format:'image/png',transparent:true,version:'1.3.0',attribution:'Victorian Government open spatial data',...opts});}
+
 const LAYERS={
-water:w('hy_watercourse',{opacity:.85}),
-contours:w('el_contour',{opacity:.75}),
-mines:w('minsite',{opacity:.9}),
-deep:w('deepld100_arc',{opacity:.85}),
-goldfields:w('goldfld100_polygon',{opacity:.35}),
-geology:w('geol250_polygon',{opacity:.28}),
-tenure:w('cl_tenure_view',{opacity:.28}),
-relief:w('el_dem_1m',{opacity:.55})
+  water:w('hy_watercourse',{opacity:.88}),
+  contours:w('el_contour',{opacity:.78}),
+  mines:w('minsite',{opacity:.95}),
+  deep:w('deepld100_arc',{opacity:.9}),
+  goldfields:w('goldfld100_polygon',{opacity:.32}),
+  geology:w('geol250_polygon',{opacity:.28}),
+  tenure:w('cl_tenure_view',{opacity:.30}),
+  relief:w('el_relief_area_fuzzy',{opacity:.34})
 };
+
+// Public 10 m DEM is a cached elevation service, not a normal image tile.
+// We use the statewide Vicmap elevation relief/contour products for a reliable
+// visual terrain layer and label it clearly as broad terrain, not LiDAR.
+const lidarCoverage=L.tileLayer.wms(WMS,{
+  layers:'open-data-platform:el_dem_1m_footprint',
+  format:'image/png',transparent:true,version:'1.3.0',
+  opacity:.5,attribution:'Victorian Government open spatial data'
+});
+
 LAYERS.water.addTo(map); LAYERS.mines.addTo(map);
 
 const targets=[
@@ -115,15 +159,33 @@ function drawTargets(){
 }
 drawTargets();
 
-function toggle(id,key){document.getElementById(id).addEventListener('change',function(){if(this.checked)LAYERS[key].addTo(map);else map.removeLayer(LAYERS[key]);});}
-Object.keys({contours:1,water:1,mines:1,deep:1,goldfields:1,geology:1,tenure:1,relief:1}).forEach(k=>toggle(k,k));
+const layerMap={contours:'contours',water:'water',mines:'mines',deep:'deep',goldfields:'goldfields',geology:'geology',tenure:'tenure',relief:'relief'};
+Object.entries(layerMap).forEach(([id,key])=>{
+ document.getElementById(id).addEventListener('change',function(){if(this.checked)LAYERS[key].addTo(map);else map.removeLayer(LAYERS[key]);});
+});
+document.getElementById('lidar').addEventListener('change',function(){
+ if(this.checked) lidarCoverage.addTo(map); else map.removeLayer(lidarCoverage);
+});
+function setLayers(list){
+ Object.entries(layerMap).forEach(([id,key])=>{
+   const on=list.includes(key); document.getElementById(id).checked=on;
+   if(on) LAYERS[key].addTo(map); else map.removeLayer(LAYERS[key]);
+ });
+}
+document.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{
+ const p=b.dataset.preset;
+ if(p==='terrain')setLayers(['contours','water','relief']);
+ if(p==='history')setLayers(['mines','deep','goldfields']);
+ if(p==='geology')setLayers(['goldfields','geology','contours']);
+ if(p==='all')setLayers(['contours','water','mines','deep','goldfields','geology']);
+});
+
 document.getElementById('jump').onclick=()=>{let v=document.getElementById('area').value.split(',').map(Number);map.setView([v[0],v[1]],v[2]);};
 document.getElementById('targetBtn').onclick=()=>{targetLayer.addTo(map);map.setView([-36.85,144.25],7);};
 document.getElementById('gps').onclick=()=>map.locate({setView:true,maxZoom:15,enableHighAccuracy:true});
 map.on('locationfound',e=>L.marker(e.latlng).addTo(map).bindPopup('Current position').openPopup());
 map.on('locationerror',()=>alert('Location unavailable. Check browser location permission.'));
-setTimeout(()=>map.invalidateSize(true),300);
-window.addEventListener('resize',()=>map.invalidateSize(true));
+setTimeout(()=>map.invalidateSize(true),300); window.addEventListener('resize',()=>map.invalidateSize(true));
 })();
 </script>
 </body>

@@ -4,5 +4,6 @@
   "start_url": ".",
   "display": "standalone",
   "background_color": "#11100d",
-  "theme_color": "#11100d"
+  "theme_color": "#11100d",
+  "description": "Victoria gold prospecting map with historical, terrain and geological evidence layers."
 }
